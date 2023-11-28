@@ -1,0 +1,29 @@
+\\192.168.1.1
+
+mô hình workroup
+		BÀI 2
+active directory
+Run : sysprep
+1.
+	sys properties
+	computer network / domain changes
+	DNS suffix
+
+2.
+	manage-> dashboard->server roles -> active directory,group policy management
+3.
+	Deployment configuration ->  add a new forest
+	-> 
+4.
+	Máy file server tham gia vào domain	
+
+BAI3
+
+	primary : add a forest
+	additional : first option
+	
+Anhduc123
+
+WinServer : KN9
+FileSys	  :O8N
+Client: 8CG

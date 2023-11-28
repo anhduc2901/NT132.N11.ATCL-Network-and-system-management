@@ -1,0 +1,100 @@
+	LÝ THUYẾT
+1.Network infrastructure
+a.Flow
+
+b.Routing
+-Static
+  -ip route [destination-network] [subnet mask] [ip of interface of router which is directly connected ]
+  -ip route 0.0.0.0 0.0.0.0 [ip of interface of router which directly connected to through cloud]
+
+
+-Dynamic
+ Rip-Distance vector
+  R0(config)#router rip 
+  R0(config)#version 2
+  R0(config)#network [ip of network , k can subnet mask]
+  R0(config)#passive-interface 
+	
+ OSPF-Link state (ROUTER)
+  R0(config)#router ospf [1]
+  R0(config)#network [ip of network] [subnetmask] area [0]
+  R0(config)#passive-interface [name or ip of interface]
+  R0(config)#default-information originate     [cho router nao co duong ra internet]
+
+
+-Switching
+ VLAN
+    S1(config)# vlan [10] , vlan [20]
+  
+
+-Switchport mode access : end devices (PC,...)
+    S1(config)#int [tên của int]
+    S1(config)#switchport mode access 
+    S1(config)#switchport access vlan [số của vlan] 
+
+
+
+-Switchport mode trunk  : router,switch
+    S1(config)#int [tên của int]
+    S1(config)#switchport mode trunk
+    S1(config)#switchport trunk allow vlan [10],[20]
+
+ -inter-vlan switching
+	Router
+	  router on a stick : sub-interface
+          	R1(config)#int g0/0/0	- phải vào interface cần chia trước
+		R1(config)#no shut
+
+			VLAN 10
+		R1(config)#int g0/0/0.10
+		R1(config)#encapsulation dot1q 10 (interface dành cho vlan 10)
+		R1(config)#ip addr [gán ip address vào cho nó + subnet mask] 
+
+			VLAN 20
+		R1(config)#int g0/0/0.20 t1q 10 (interface dành cho vlan 20)
+		R1(config)#ip addr [gán ip address vào cho nó + subnet mask]
+
+
+	SWL3
+	  interface ảo
+2.System 
+a.Window (ADDS)
+
+b.Linux (command line)
+
+DHCP,NAT,DNS,ACL : giao giữa network , system : network services
+
+
+
+   			DHCP configuration						xx
+ROUTER AS DHCP SERVER
+Router(config)#ip dhcp excluded-address [ip-address or ip range]
+Router(config)#ip dhcp pool [tên của pool]
+Router(config)#network [ip of network] [subnet mask]
+Router(config)#default-router [default-gateway của mạng cần cấp ip]			xx
+Router(config)#dns-server [ip of dns server]          
+
+
+			NAT (TRUY CAP RA BEN NGOAI INTERNET)
+
+Router(config)#access-list 1 permit 192.168.0.0 255.255.0.0
+Router(config)#ip nat insside source-list 1 interface [ket noi vs internet] overload
+Router(config)#int []
+Router(config)#ip nat inside
+Router(config)#int []
+Router(config)#ip nat outside	
+		
+
+			NAT (DE BEN NGOAI INTERNET TRUY CAP VAO INTERNAL NETWORK)
+
+
+Router(config)#ip nat source static private ip] [public ip]
+
+
+
+
+
+
+
+
+

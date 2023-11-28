@@ -1,0 +1,5 @@
+1.zabbix là gì
+2.monitor những cái gì 
+3.Thành phần ... 
+4.Hoạt động sao 
+5. topology 

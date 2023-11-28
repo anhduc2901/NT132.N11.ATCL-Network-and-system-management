@@ -1,0 +1,73 @@
+	LÝ THUYẾT
+1.Network infrastructure
+a.Flow
+
+b.Routing
+-Static
+  -Router(config)#ip route [destination network] [subnet mask] [next-hop interface]
+   int cua router noi tt vs router ma ta dang config
+
+Rip-Distance vector
+
+Router(config)#router rip
+Router(config)#version2
+Router(config)#network [ip of network]
+Router(config)#passive-interface [int]
+Router(config)#default-information originate
+
+OSPF-Link state (ROUTER)
+
+Router(config)#router ospf [1]
+Router(config)#network [ip]
+Router(config)#passive-interface
+Router(config)#default-information originate
+
+
+
+-Switching
+ VLAN
+S1(config)#vlan [10],[20]
+
+
+-Switchport mode access : end devices (PC,...)
+S1(config)#switchport mode access
+S1(config)#switchport access vlan [10],[20]
+
+
+-Switchport mode trunk  : router,switch
+S1(config)#switchport mode trunk
+S1(config)#switchport trunk allowed vlan [10,20]
+
+
+ -inter-vlan switching
+	Router
+	  router on a stick : sub-interface
+Router(config)#int g0/0/0.10
+Router(config)#encapsulation dot1q 10
+Router(config)#ip addr [ip of int]
+
+
+DHCP configuration
+Router(config)#ip dhcp pool [name: vlan 10,20,..]
+Router(config)#network [ip] [subnet]
+Router(config)#default-gate way [ip] [subnet]
+Router(config)#dns-server [ip]
+
+NAT (ra ngoai internet)
+Router(config)#access-list 1 permit [ip]
+Router(config)#ip nat inside  source-list 1 interface [int] overload
+Router(config)#int []
+Router(config)#ip nat inside
+Router(config)#int []
+Router(config)#ip nat outside
+
+
+NAT(Ngoai internet di vao)
+
+Router(config)#ip nat inside source static [private ip] [public ip]
+
+
+
+
+
+

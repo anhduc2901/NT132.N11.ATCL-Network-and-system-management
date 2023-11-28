@@ -1,0 +1,60 @@
+			QUAN TÂM ĐẾN NGUỒN VÀ ĐÍCH
+EXTENDED : gần nguồn	
+standard : gần đích
+xem đường đi
+
+-p : giao thức
+-s : nguồn
+-d : đích
+
+R1:
+
+(allow all to access web on daa.uit.edu.vn)
+ acess-list 103 permit tcp any host 192.168.10.10 eq 80
+ acess-list 103 permit tcp any host 192.168.10.10 eq 443
+ int G0 
+ ip access-group 103 out
+
+SWL3 :
+ (only allow P.KHTC access web on khtc.uit)
+ acess-list 101 permit tcp 192.168.2.0 0.0.0.255 host 192.168.10.11 eq 80
+ acess-list 101 permit tcp 192.168.2.0 0.0.0.255 host 192.168.10.11 eq 443
+ int G4
+ ip access-group 101 in
+
+SWL3:
+ (only allow IT use ssh to remote access to R1,SWL3,SERVERS)
+ access-list 102 permit tcp 192.168.3.0 0.0.0.255 any eq 22
+ int G2
+ ip access-group 102 in
+
+
+
+2.	IP TABLES
+
+https://www.geeksforgeeks.org/iptables-command-in-linux-with-examples/?fbclid=IwAR1FiK9NnO0N_dcaY4zsdp1GSHS5EmbZ5qEgTg0AOj7ygHxX0UsDiX7gPnU
+https://www.digitalocean.com/community/tutorials/iptables-essentials-common-firewall-rules-and-commands#service-web-server
+			daa.uit (trên R1)
+1.
+(Thêm 1 rule cho phép tất cả truy cập đến website của daa.uit)
+
+iptables -t filter -A INPUT -s any -d 192.168.10.10 -p tcp -m tcp --dport 80,443 -j ACCEPT
+
+
+			khtc.uit (R1)
+2.
+(Chỉ cho phép P.KHTC-192.168.2.0 truy cập đến web của của khtc.uit-192.168.10.11)
+
+iptables -t filter -A INPUT –s !192.168.2.0 –d 192.168.10.11 -p tcp -m tcp --dport 80,443 –j REJECT
+
+			switch near IT (SWL3)
+3.
+(chỉ cho phép 192.168.3.0 truy cập ssh đến R1,SWL3,Servers)
+
+iptables -t filter -A INPUT –s !192.168.3.0 –d any –p tcp –m tcp --dport 22 –j REJECT
+ 
+3.	WEB SERVERs
+
+iptables -t filter -A FORWAORD -s any -d 192.168.10.10 -p tcp -m tcp --dport 80,443 -j ACCEPT
+iptables -t filter -A FORWAORD –s !192.168.2.0 –d 192.168.10.11 -p tcp -m tcp --dport 80,443 –j REJECT
+iptables -t filter -A FORWAORD –s !192.168.3.0 –d any –p tcp –m tcp --dport 22 –j REJECT

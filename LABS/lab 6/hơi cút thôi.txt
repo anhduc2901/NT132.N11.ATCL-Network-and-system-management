@@ -1,0 +1,134 @@
+				1.CẤU HÌNH CƠ BẢN TRÊN  			ROUTER
+-conf t
+-hostname [tên router]
+
+	kết nối sử dụng putty,..
+-conf t
+-line console 0-4
+-password "letmein"
+-login
+
+	privileges mode (encrypted)
+-conf t
+-enable password "letmein"
+-service password-encryption
+-end
+
+	motd (router)
+-conf t
+-banner motd "Warning ! Authorized access only"	
+
+			
+	CHÚ Ý: SWL3
+ip routing (để swl3 routing giữa các vlan)
+no switchport (để 1 interface nào đó có nhiệm vụ như router mà k phải là như switch)
+chưa chạy đc là cấu hình thiếu (xem lại từ lúc bắt đầu cấu hình chức năng nào đó)
+
+
+				2.SWITCH CHIA THÀNH 2 VLAN : CLIENTS VÀ SERVERS
+-Có thể sử dụng interface ảo (interface vlan)để làm các default gateway
+
+
+	TẠO VLAN TRÊN SWITCH
+S1(config)# vlan 10 , vlan 20
+	
+
+	GÁN INTERFACE VÀO CÁC VLAN TƯƠNG ỨNG					 - SWITCH /	S1(config)#
+S1(config)#int [tên của int]
+S1(config)#switchport mode access 
+S1(config)#switchport access vlan [số của vlan] 
+
+
+	CẤU HÌNH ĐƯỜNG TRUNK ( ĐƯỜNG CÓ NHIỀU VLAN ĐI QUA)			 - SWITCH
+S1(config)#int [tên của int]
+S1(config)#switchport mode trunk
+S1(config)#switchport trunk allow vlan 10,20
+
+
+	TẠO RA SUB-INTERFACE (ROUTER)					 	 - ROUTER : R1(config)#
+R1(config)#int g0/0/0	- phải vào interface cần chia trước
+R1(config)#no shut
+
+	VLAN 10
+R1(config)#int g0/0/0.10
+R1(config)#encapsulation dot1q 10 (interface dành cho vlan 10)
+R1(config)#ip addr [gán ip address vào cho nó + subnet mask] 
+
+	VLAN 20
+R1(config)#int g0/0/0.20
+R1(config)#encapsulation dot1q 10 (interface dành cho vlan 20)
+R1(config)#ip addr [gán ip address vào cho nó + subnet mask]
+
+
+
+	CẤP IP CHO PC0
+1.dns server : 192.168.10.10
+2.default-gateway : 192.168.20.1
+	
+	NAT ĐỂ TẤT CẢ THIẾT BỊ TRONG MẠNG NỘI BỘ TRUY CẬP RA INTERNET (dùng chung 1 or nh địa chỉ public để truy cập)
+Chọn router gần internet nhất
+
+Router(config)#access-list [1] permit [mạng mà chúng ra muốn ra ngoài] -   
+					192.168.20.0      0.0.0.255
+Router(config)#ip nat inside source list [1] interface [tên của int knối tt vs internet] overload
+								g0/0/0
+Router(config)#int g0/0/0
+Router(config)#ip nat outside						kt = sh ip translation
+Router(config)#int g0/0/1.20
+Router(config)#ip nat inside
+
+
+	CẤM CLIENT TELNET ĐẾN R0 (muốn telnet thì cấu hình line vty)
+R0(config)#access-list [104] deny tcp	[192.168.20.0] [0.0.0.255] 	host 	[192.168.10.11] eq 23
+R0(config)#int g0/0/1.20
+R0(config)#ip access-group 103 in
+
+
+
+	CẤU HÌNH NAT TĨNH ĐỂ CÁC PC NGOÀI TRUY CẬP VÀO WEBSERVER
+Router(config)#ip nat insdie source static [private ip] 	[public ip]
+					   192.168.10.11 	địa chỉ mình muốn mà pc ngoài kết nối vào
+Router(config)#int g0/0/0
+Router(config)#ip nat outside
+Router(config)#int g0/0/1.10
+Router(config)#ip nat inside	
+
+
+
+	BLOCK KẾT NỐI TELNET TỪ CLIENTS ĐẾN ROUTER R0  
+	#REAL#
+R0(config)#access-list 2 deny 192.168.20.0 0.0.0.255
+R0(config)#line vty 0 4
+R0(config)#access-class 2 in
+
+
+
+
+	CHO PHÉP CIENTS Ở VL20 TRUY CẬP WEB SERVER CHỈ ĐC SỬ DỤNG HTTP/HTTPS
+R0(config)#access-list [103] permit tcp	[192.168.20.0] 	host 	[192.168.10.11] eq 80
+R0(config)#access-list [103] permit tcp	[192.168.20.0] 	host 	[192.168.10.11] eq 443
+R0(config)#access-list [103] deny 192.168.20.0 192.168.10.11
+R0(config)#int g0/0/1.20
+R0(config)#ip access-group 103 in
+
+
+
+			DHCP configuration						xx
+ROUTER AS DHCP SERVER
+Router(config)#ip dhcp excluded-address [ip-address or ip range]
+Router(config)#ip dhcp pool [tên của pool]
+Router(config)#network [ip of network] [subnet mask]
+Router(config)#default-router [default-gateway của mạng cần cấp ip]			xx
+Router(config)#dns-server [ip of dns server]						xx
+
+
+NHỚ CẤU HÌNH CÁI DƯỚI NÀY Ở CẢ 2 INTERFACE (G0/0/1.10-.20)				xx
+Relay agent (CẤU HÌNH TRÊN SWL3 ĐỂ CHUYỂN TIẾP CÁC GÓI TIN YÊU CẦU CẤP IP MÀ BÌNH THƯỜNG ROUTER CHẶN LẠI)
+- ip helper-address [ip-address-of-the-dhcp-server] (cấu hình trên router gần vs mạng cần đc cấp nhất)
+
+
+
+
+
+
+

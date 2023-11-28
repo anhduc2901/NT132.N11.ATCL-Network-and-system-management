@@ -1,0 +1,17 @@
+subnet : 10.0.0.0/24
+Address: 10.0.0.8/24
+Name Servers : 10.0.0.2 , 10.0.0.10
+Gateway :10.0.0.10
+Search domains: teknek.local / nhom5.local
+
+
+
+	TASK
+name 	task 	/10
+
+	SELF - ASSIGNMENT
+present
+demo
+theory
+report
+	ANSWER

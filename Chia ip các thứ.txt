@@ -1,0 +1,8 @@
+ 
+			SỐ USABLE HOST <= 254
+số bit mượn : N
+ Số bit host : M
+	M+N=8
+ 2^m : tên mạng mới
+ 2^m - 1 : địa chỉ broadcast
+ 2^m -2  : số host sử dụng đc
